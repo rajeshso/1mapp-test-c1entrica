@@ -6,5 +6,7 @@ import akka.actor.{Actor, ActorRef}
   */
 class BeanCounter(sender: ActorRef) extends Actor {
   var counter = 0
-  def receive: PartialFunction[Any, Unit] = ???
+  def receive: PartialFunction[Any, Unit] = {
+    case _ => sender ! "test"
+  }
 }
