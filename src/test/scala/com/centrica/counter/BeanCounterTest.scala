@@ -5,7 +5,7 @@ import akka.testkit.TestActors
 import scala.concurrent.duration._
 
 /**
-  * Created by rajes on 18-Apr-17.
+  * Created by rajesh on 18-Apr-17.
   */
 class BeanCounterTest extends UnitSpec {
 
@@ -72,6 +72,18 @@ class BeanCounterTest extends UnitSpec {
         messages = receiveOne(100 millis)
       }
       messages.toString should equal ("5")
+    }
+  }
+  "My Bean Counter" should {
+    "return a message when a tomato is added" in {
+      var messages : AnyRef = ""
+      val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
+      within(100 millis) {
+        beanCounterActorNewRef !  AddTomato
+        beanCounterActorNewRef ! CountTomatoes
+        messages = receiveOne(100 millis)
+      }
+      messages.toString should equal ("Can't count, won't count tomatoes. i only count beans")
     }
   }
 }
