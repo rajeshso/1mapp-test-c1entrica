@@ -23,4 +23,55 @@ class BeanCounterTest extends UnitSpec {
       }
     }
   }
+  "My Bean Counter" should {
+    "return 0 when there are no beans added" in {
+      var messages : AnyRef = ""
+      val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
+      within(100 millis) {
+        beanCounterActorNewRef ! CountBeans
+        messages = receiveOne(100 millis)
+      }
+      messages.toString should equal ("0")
+    }
+  }
+  "My Bean Counter" should {
+    "return one as a Count when one bean is added" in {
+      var messages : AnyRef = ""
+      val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
+      within(100 millis) {
+        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef ! CountBeans
+        messages = receiveOne(100 millis)
+      }
+      messages.toString should equal ("1")
+    }
+  }
+  "My Bean Counter" should {
+    "return one as a Count when one bean is added again" in {
+      var messages : AnyRef = ""
+      val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
+      within(100 millis) {
+        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef ! CountBeans
+        messages = receiveOne(100 millis)
+      }
+      messages.toString should equal ("1")
+    }
+  }
+  "My Bean Counter" should {
+    "return five as a Count when five beans are added" in {
+      var messages : AnyRef = ""
+      val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
+      within(100 millis) {
+        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef ! CountBeans
+        messages = receiveOne(100 millis)
+      }
+      messages.toString should equal ("5")
+    }
+  }
 }
