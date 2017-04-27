@@ -9,18 +9,18 @@ import scala.concurrent.duration._
   */
 class BeanCounterTest extends UnitSpec {
 
-  val testActorRef: ActorRef = system.actorOf(TestActors.echoActorProps)
-
   override def afterAll {
     shutdown()
   }
 
   "A TestActor" should {
     "Respond with the test message it receives" in {
+      val testActorRef: ActorRef = system.actorOf(TestActors.echoActorProps)
       within(500 millis) {
         testActorRef ! "test"
         expectMsg("test")
       }
+      system.stop(testActorRef)
     }
   }
   "My Bean Counter" should {
@@ -31,6 +31,7 @@ class BeanCounterTest extends UnitSpec {
         beanCounterActorNewRef ! CountBeans
         messages = receiveOne(100 millis)
       }
+      system.stop(beanCounterActorNewRef)
       messages.toString should equal ("0")
     }
   }
@@ -39,10 +40,11 @@ class BeanCounterTest extends UnitSpec {
       var messages : AnyRef = ""
       val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
       within(100 millis) {
-        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef ! AddBeans(1)
         beanCounterActorNewRef ! CountBeans
         messages = receiveOne(100 millis)
       }
+      system.stop(beanCounterActorNewRef)
       messages.toString should equal ("1")
     }
   }
@@ -51,10 +53,11 @@ class BeanCounterTest extends UnitSpec {
       var messages : AnyRef = ""
       val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
       within(100 millis) {
-        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef ! AddBeans(1)
         beanCounterActorNewRef ! CountBeans
         messages = receiveOne(100 millis)
       }
+      system.stop(beanCounterActorNewRef)
       messages.toString should equal ("1")
     }
   }
@@ -63,14 +66,11 @@ class BeanCounterTest extends UnitSpec {
       var messages : AnyRef = ""
       val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
       within(100 millis) {
-        beanCounterActorNewRef !  AddBean
-        beanCounterActorNewRef !  AddBean
-        beanCounterActorNewRef !  AddBean
-        beanCounterActorNewRef !  AddBean
-        beanCounterActorNewRef !  AddBean
+        beanCounterActorNewRef ! AddBeans(5)
         beanCounterActorNewRef ! CountBeans
         messages = receiveOne(100 millis)
       }
+      system.stop(beanCounterActorNewRef)
       messages.toString should equal ("5")
     }
   }
@@ -79,11 +79,24 @@ class BeanCounterTest extends UnitSpec {
       var messages : AnyRef = ""
       val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
       within(100 millis) {
-        beanCounterActorNewRef !  AddTomato
+        beanCounterActorNewRef ! AddTomatos(1)
         beanCounterActorNewRef ! CountTomatoes
         messages = receiveOne(100 millis)
       }
+      system.stop(beanCounterActorNewRef)
       messages.toString should equal ("Can't count, won't count tomatoes. i only count beans")
+    }
+  }
+  "My Bean Counter" should {
+    "return an Invalid message for an incorrect input" in {
+      var messages: AnyRef = ""
+      val beanCounterActorNewRef = system.actorOf(Props(classOf[BeanCounter], testActor))
+      within(100 millis) {
+        beanCounterActorNewRef ! Int
+        messages = receiveOne(100 millis)
+      }
+      system.stop(beanCounterActorNewRef)
+      messages.toString should equal("Invalid message")
     }
   }
 }
